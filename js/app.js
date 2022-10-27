@@ -3,6 +3,8 @@
 const formulario = document.querySelector('#formulario');
 //resultados
 const resultado = document.querySelector('#resultado');
+//variable donde se renderizara la paginacion
+const paginacionDiv = document.querySelector('#paginacion');
 //varible que representa la cantidad de registros que mostrara la API
 const registrosPorPagina = 40;
 //variable para saber el total de paginas para hacer la paginacion
@@ -64,7 +66,7 @@ function buscarImagenes( termino ) {
     //key de la API
     const key = '30907566-3221c4d1c76ae349991022cae';
     //url
-    const url = `https://pixabay.com/api/?key=${ key }&q=${ termino }&per_page=100`;
+    const url = `https://pixabay.com/api/?key=${ key }&q=${ termino }&per_page=${ registrosPorPagina }`;
     //fetch
     fetch( url )
         .then( respuesta => respuesta.json() )
@@ -72,7 +74,7 @@ function buscarImagenes( termino ) {
                 //llamamos funcion para calcular el numero de paginas en base al numero de registros
                 //pasamos como argumento resultado.totalHits que es, el numero total de registros traidos desde la API
                 totalPaginas = calcularPaginas( resultado.totalHits );
-                console.log( totalPaginas );
+                //console.log( totalPaginas );
                 //llamar la funcion mostrarImagenes
                 //y como argumento le pasamos resultado.hits que son las imagenes con su informacion
                 mostrarImagenes( resultado.hits );
@@ -111,7 +113,7 @@ function mostrarImagenes( imagenes ) {
     imagenes.forEach( imagen => {
         //destructuring
         const { previewURL, likes, views, largeImageURL } = imagen;
-        console.log( imagen );    
+        //console.log( imagen );    
         //renderizamos con innehtml
         resultado.innerHTML += `
             <div class="w-1/2 md:w-1/3 lg:w-1/4 p-3 mb-4">
@@ -135,6 +137,10 @@ function mostrarImagenes( imagenes ) {
         `;
 
     });
+    //limpiar el paginador previo
+    while ( paginacionDiv.firstChild ) {
+        paginacionDiv.removeChild( paginacionDiv.firstChild );
+    }
     //llamamos la funcion para imprimir paginador
     imprimirPaginador();
 
@@ -143,4 +149,30 @@ function mostrarImagenes( imagenes ) {
 function imprimirPaginador() {
     //llamamos el generador
     iterador = crearPaginador( totalPaginas );
+    
+    //console.log( iterador.next() ); ///{value: 1, done: false} en consola
+    //con un while vamos a revisar un true
+    while ( true ) {
+        //destructuring
+        //value = pagina actual, 1,2,3,4, etc..
+        //done = si ya estan terminadas las paginas, que ya estan todas las paginas
+        const { value, done } = iterador.next();
+        //en caso de que sea DONE es decir que ya este hecho ya no se ejecuta nada con un return
+        if ( done ) return;
+
+        //en caso contrario, genera un boton por cada elemento en el generador
+        const boton = document.createElement('a');
+        //href
+        boton.href = '#';
+        //data-pagina = 1,2,3,4, etc...
+        boton.dataset.pagina = value;
+        //texcontent
+        boton.textContent = value;
+        //estilos
+        boton.classList.add('siguiente', 'bg-yellow-400', 'px-4', 'py-1', 'mr-2', 'font-bold', 'mb-1', 'uppercase', 'rounded');
+        //renderizacion
+        paginacionDiv.appendChild( boton );
+
+    }
+
 }
