@@ -7,6 +7,8 @@ const resultado = document.querySelector('#resultado');
 const registrosPorPagina = 40;
 //variable para saber el total de paginas para hacer la paginacion
 let totalPaginas;
+//iterador para el generador
+let iterador;
 
 
 //listeners
@@ -77,6 +79,18 @@ function buscarImagenes( termino ) {
             });
     
 }
+//generador que va a registrar la cantidad de elementos de acuerdo a las paginas
+//los generadores llevan un * despues de function
+//function *
+//pasamos como argumento total
+function *crearPaginador( total ) {
+    //inicializamos i igual a 1
+    for( let i = 1; i <= total; i++) {
+        //con yield registramos el valor
+        yield i;
+    }
+}
+
 //funcion para calcular las paginas de forma dinamica
 function calcularPaginas( total ) {
     //con esta formula calcular el numero de paginas que deben de haber en base a el numero de registros que no traiga la API
@@ -121,5 +135,12 @@ function mostrarImagenes( imagenes ) {
         `;
 
     });
+    //llamamos la funcion para imprimir paginador
+    imprimirPaginador();
 
+}
+//funcion para imprimir el paginador
+function imprimirPaginador() {
+    //llamamos el generador
+    iterador = crearPaginador( totalPaginas );
 }
